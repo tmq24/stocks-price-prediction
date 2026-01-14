@@ -8,7 +8,7 @@ Split (date-based):
   - Test: 2024-01-01 to 2025-06-20
 Test: Evaluated separately per ticker
 Models: Saved to models/
-Plots: Generated for sample tickers (AAPL, PEP)
+Plots: Generated for all 5 tickers
 """
 
 import argparse
@@ -34,8 +34,6 @@ INPUT_WINDOWS = [5, 10, 15]
 OUTPUT_HORIZONS = [1, 5, 10]
 
 STOCKS = ['AAPL', 'HSBC', 'PEP', 'TM', 'TCEHY']
-SAMPLE_TICKERS = ['AAPL', 'PEP']
-
 
 # ================================================================
 # PIPELINE FUNCTIONS
@@ -52,7 +50,7 @@ def run_full_benchmark(verbose: bool = True, generate_plots: bool = True):
     print(f"Input Windows: {INPUT_WINDOWS}")
     print(f"Output Horizons: {OUTPUT_HORIZONS}")
     print(f"Stocks: {STOCKS}")
-    print(f"Plot Samples: {SAMPLE_TICKERS}")
+    print(f"Plot Tickers: {STOCKS} (all)")
     print(f"Split: Train(~2021) / Val(2022-2023) / Test(2024+)")
     total = len(MODELS) * len(INPUT_WINDOWS) * len(OUTPUT_HORIZONS)
     print(f"Total Experiments: {total}")
@@ -66,7 +64,7 @@ def run_full_benchmark(verbose: bool = True, generate_plots: bool = True):
         output_dir="evaluation",
         verbose=verbose,
         generate_plots=generate_plots,
-        plot_tickers=SAMPLE_TICKERS
+        plot_tickers=STOCKS
     )
     
     return results
@@ -86,7 +84,7 @@ def run_quick_test():
         output_dir="evaluation",
         verbose=True,
         generate_plots=True,
-        plot_tickers=SAMPLE_TICKERS
+        plot_tickers=STOCKS
     )
     
     return results
@@ -101,7 +99,7 @@ def run_single_experiment(model: str, window: int, horizon: int):
         input_windows=[window],
         output_horizons=[horizon],
         stocks=STOCKS,
-        plot_tickers=SAMPLE_TICKERS
+        plot_tickers=STOCKS
     )
     
     results = runner.run_single_experiment(
