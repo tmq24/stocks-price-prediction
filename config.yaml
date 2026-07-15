@@ -1,0 +1,77 @@
+llm:
+  narrative_model: "gpt-4.1-nano"
+  narrative_api_base: "https://api.openai.com/v1"
+  narrative_api_key_env: "OPENAI_API_KEY"
+  alpha_model: "gpt-4.1-mini"
+  alpha_api_base: "https://api.openai.com/v1"
+  alpha_api_key_env: "OPENAI_API_KEY"
+  cache_dir: "data/llm_cache"
+
+data:
+  tickers:
+    - AAPL
+    - HSBC
+    - PEP
+    - TM
+    - TCEHY
+  start_date: "2016-05-01"
+  end_date: "2024-05-08"
+  price_dir: "data/price"
+  news_file: "data/news/paper_news_daily.csv"
+  alphas_dir: "data/alphas"
+  # Sentiment fed to the alpha generator: per-company cross-company polarity
+  # (paper 2508 style) from data/news/sentiment_features/<TICKER>.csv
+  window_size: 5
+  target_col: "close"
+  horizons:
+    - 1
+
+alpha_regen:
+  periodic_frequency: 63
+  cooldown_days: 21
+  regime_persist_days: 5
+  vol_percentile_threshold: 75
+
+models:
+  transformer_encdec:
+    num_encoder_layers: 3
+    num_decoder_layers: 2
+    d_model: 512
+    nhead: 8
+    dim_feedforward: 512
+    dropout: 0.0
+    use_skip: true
+  # Baseline architectures (kept for comparison; run via --models lstm/nbeats).
+  lstm:
+    hidden_dim: 128
+    num_layers: 2
+    dropout: 0.2
+    bidirectional: false
+  gru:
+    hidden_dim: 128
+    num_layers: 2
+    dropout: 0.2
+    bidirectional: false
+  nbeats:
+    trend_blocks: 2
+    trend_layers: 4
+    trend_neurons: 128
+    seasonality_blocks: 2
+    seasonality_layers: 4
+    seasonality_neurons: 128
+    generic_blocks: 2
+    generic_layers: 4
+    generic_neurons: 128
+    dropout: 0.1
+
+training:
+  batch_size: 64
+  num_epochs: 50
+  lr: 0.00005
+  patience: 20
+  seeds: [42, 43, 44, 45, 46, 47, 48, 49, 50, 51]
+
+# DA-LLM ablations (see src/thesis_runner.py):
+#   A1 = C1 OFF (no regime trigger)
+#   A2 = C2 OFF (aggregate IC only, no per-alpha feedback)
+#   A3 = C3 OFF (generate 5 directly, no top-K filter)
